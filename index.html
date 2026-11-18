@@ -6,25 +6,38 @@
 <meta name="theme-color" content="#1255d8">
 <title>SwiftData NG | Fast Data. Easy Airtime.</title>
 <style>
-:root{--blue:#1457d9;--deep:#0b2c68;--pale:#eef4ff;--ink:#17243b;--muted:#68758b;--line:#e5ebf4}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;color:var(--ink);background:#f6f8fc}
+:root{--blue:#1457d9;--pale:#eef4ff;--ink:#17243b;--muted:#68758b;--line:#e5ebf4}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;color:var(--ink);background:#f6f8fc}
 header{background:white;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:3}
-.nav{max-width:1100px;margin:auto;padding:16px 22px;display:flex;align-items:center;justify-content:space-between}
-.brand{font-size:22px;font-weight:850;color:var(--blue);letter-spacing:-.7px}.brand span{color:#1b2a44}
-.nav a{color:#42516a;text-decoration:none;margin-left:22px;font-size:14px;font-weight:650}
+.nav{max-width:1100px;margin:auto;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:22px;font-weight:850;color:var(--blue);letter-spacing:-.7px;white-space:nowrap}
+.brand span{color:#1b2a44}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav a{color:#42516a;text-decoration:none;margin-left:12px;font-size:14px;font-weight:650}
+.nav button{border:1px solid #dce6f7;background:white;color:var(--blue);padding:10px 12px;border-radius:10px;font-weight:750;cursor:pointer}
+.nav button.signup{background:var(--blue);border-color:var(--blue);color:white}
 .hero{background:linear-gradient(120deg,#0d3b9a,#1768ed);color:white;padding:58px 22px 76px}
 .hero-inner{max-width:1050px;margin:auto;display:grid;grid-template-columns:1.2fr .8fr;gap:35px;align-items:center}
 .eyebrow{font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#c8dcff}
-h1{font-size:clamp(36px,5vw,55px);line-height:1.06;margin:13px 0}.hero p{color:#e1ebff;line-height:1.7;max-width:510px}
+h1{font-size:clamp(36px,5vw,55px);line-height:1.06;margin:13px 0}
+.hero p{color:#e1ebff;line-height:1.7;max-width:510px}
 .pill{display:inline-block;background:#ffffff20;border:1px solid #ffffff40;border-radius:30px;padding:8px 13px;font-size:12px}
 .hero-card{background:white;color:var(--ink);border-radius:22px;padding:24px;box-shadow:0 20px 50px #08245c55}
-.hero-card h3{margin:0 0 8px}.hero-card p{color:var(--muted);font-size:13px;margin:0}
-.stats{display:flex;gap:12px;margin-top:22px}.stat{background:var(--pale);padding:13px;border-radius:12px;flex:1}.stat b{display:block;color:var(--blue);font-size:18px}.stat small{color:var(--muted)}
+.hero-card h3{margin:0 0 8px}
+.hero-card p{color:var(--muted);font-size:13px;margin:0}
+.stats{display:flex;gap:12px;margin-top:22px}
+.stat{background:var(--pale);padding:13px;border-radius:12px;flex:1}
+.stat b{display:block;color:var(--blue);font-size:18px}
+.stat small{color:var(--muted)}
 main{max-width:1050px;margin:-34px auto 50px;padding:0 22px;position:relative}
 .shop{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
 .panel{background:white;border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 8px 28px #18396c0b}
-.panel h2{font-size:20px;margin:0 0 6px}.sub{color:var(--muted);font-size:13px;margin:0 0 20px}
-.tabs{display:flex;gap:8px;margin-bottom:18px}.tab{border:1px solid var(--line);background:white;border-radius:10px;padding:10px 16px;font-weight:750;color:#526078;cursor:pointer}.tab.active{background:var(--pale);border-color:#a9c5ff;color:var(--blue)}
+.panel h2{font-size:20px;margin:0 0 6px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 20px}
+.tabs{display:flex;gap:8px;margin-bottom:18px}
+.tab{border:1px solid var(--line);background:white;border-radius:10px;padding:10px 16px;font-weight:750;color:#526078;cursor:pointer}
+.tab.active{background:var(--pale);border-color:#a9c5ff;color:var(--blue)}
 label{display:block;font-size:12px;font-weight:750;color:#536078;margin:15px 0 7px}
 input,select{width:100%;border:1px solid #dce4f0;border-radius:10px;padding:13px 12px;font-size:14px;background:#fff;color:var(--ink);outline:none}
 input:focus,select:focus{border-color:#6c9cff;box-shadow:0 0 0 3px #1457d91a}
@@ -33,58 +46,246 @@ input:focus,select:focus{border-color:#6c9cff;box-shadow:0 0 0 3px #1457d91a}
 .network.active{border:2px solid var(--blue);background:var(--pale);color:var(--blue)}
 .dot{display:block;width:23px;height:23px;border-radius:50%;margin:0 auto 7px;background:#dbe6ff}
 .amount{display:flex;align-items:center;justify-content:space-between;background:var(--pale);padding:14px;border-radius:12px;margin:18px 0}
-.amount span{font-size:13px;color:var(--muted)}.amount strong{font-size:23px;color:var(--blue)}
+.amount span{font-size:13px;color:var(--muted)}
+.amount strong{font-size:23px;color:var(--blue)}
 button.primary{width:100%;border:0;background:var(--blue);color:white;border-radius:11px;padding:15px;font-size:15px;font-weight:800;cursor:pointer}
-button.primary:hover{background:#0d45b6}
 .notice{font-size:11px;color:var(--muted);line-height:1.55;margin:13px 0 0}
-.service-list{display:grid;gap:12px;margin-top:20px}.service{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid var(--line);border-radius:12px}.icon{width:38px;height:38px;border-radius:11px;background:var(--pale);display:grid;place-items:center;color:var(--blue);font-weight:900}.service b{font-size:13px}.service small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.service-list{display:grid;gap:12px;margin-top:20px}
+.service{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid var(--line);border-radius:12px}
+.icon{width:38px;height:38px;border-radius:11px;background:var(--pale);display:grid;place-items:center;color:var(--blue);font-weight:900}
+.service b{font-size:13px}
+.service small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
 footer{text-align:center;padding:25px;color:#77849a;font-size:12px}
-.modal{display:none;position:fixed;inset:0;background:#071b3dcc;z-index:5;align-items:center;justify-content:center;padding:20px}.modal.show{display:flex}.modal-box{background:white;border-radius:18px;padding:25px;max-width:420px;width:100%}.modal-box h3{margin-top:0}.modal-box p{color:var(--muted);font-size:14px;line-height:1.6}.close{float:right;border:0;background:#edf2fa;border-radius:50%;width:30px;height:30px;cursor:pointer}
-@media(max-width:760px){.hero-inner,.shop{grid-template-columns:1fr}.hero{padding-top:42px}.nav a{margin-left:10px;font-size:12px}.hero-card{max-width:440px}.panel{padding:19px}}
+.modal{display:none;position:fixed;inset:0;background:#071b3dcc;z-index:5;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.modal.show{display:flex}
+.modal-box{background:white;border-radius:18px;padding:25px;max-width:440px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-box h3{margin-top:0}
+.modal-box p{color:var(--muted);font-size:14px;line-height:1.6}
+.close{float:right;border:0;background:#edf2fa;border-radius:50%;width:30px;height:30px;cursor:pointer}
+.auth-tabs{display:flex;gap:8px;margin:18px 0}
+.auth-tabs button{flex:1;padding:11px;border:1px solid var(--line);background:#fff;border-radius:10px;font-weight:750;color:#526078;cursor:pointer}
+.auth-tabs button.active{background:var(--pale);border-color:#a9c5ff;color:var(--blue)}
+.auth-message{display:none;background:#fff7e6;color:#805500;padding:11px;border-radius:9px;font-size:12px;line-height:1.5;margin:12px 0}
+.auth-foot{font-size:11px!important;color:var(--muted);margin-bottom:0}
+@media(max-width:760px){
+.hero-inner,.shop{grid-template-columns:1fr}
+.hero{padding-top:42px}
+.nav{padding:13px 14px}
+.nav-right{gap:7px}
+.nav a{display:none}
+.nav button{padding:9px 10px;font-size:12px}
+.brand{font-size:20px}
+.hero-card{max-width:440px}
+.panel{padding:19px}
+}
 </style>
 </head>
 <body>
-<header><div class="nav"><div class="brand">Swift<span>Data</span> NG</div><nav><a href="#buy">Buy Data</a><a href="#services">Services</a><a href="#help">Support</a></nav></div></header>
-<section class="hero"><div class="hero-inner">
-<div><span class="pill">YOUR EVERYDAY CONNECTIVITY PARTNER</span><div class="eyebrow" style="margin-top:22px">Fast Data. Easy Airtime.</div><h1>Stay connected.<br>Stay ahead.</h1><p>Buy mobile data and airtime for your favourite Nigerian networks through one simple, convenient platform.</p></div>
-<div class="hero-card"><h3>Welcome to SwiftData NG</h3><p>Simple top-ups for the people and things that matter.</p><div class="stats"><div class="stat"><b>4</b><small>Networks</small></div><div class="stat"><b>2</b><small>Services</small></div><div class="stat"><b>24/7</b><small>Online access</small></div></div></div>
-</div></section>
+
+<header>
+<div class="nav">
+<div class="brand">Swift<span>Data</span> NG</div>
+<div class="nav-right">
+<nav>
+<a href="#buy">Buy Data</a>
+<a href="#services">Services</a>
+<a href="#help">Support</a>
+</nav>
+<button onclick="openAuth('login')">Log in</button>
+<button class="signup" onclick="openAuth('signup')">Create account</button>
+</div>
+</div>
+</header>
+
+<section class="hero">
+<div class="hero-inner">
+<div>
+<span class="pill">YOUR EVERYDAY CONNECTIVITY PARTNER</span>
+<div class="eyebrow" style="margin-top:22px">Fast Data. Easy Airtime.</div>
+<h1>Stay connected.<br>Stay ahead.</h1>
+<p>Buy mobile data and airtime for your favourite Nigerian networks through one simple, convenient platform.</p>
+</div>
+<div class="hero-card">
+<h3>Welcome to SwiftData NG</h3>
+<p>Simple top-ups for the people and things that matter.</p>
+<div class="stats">
+<div class="stat"><b>4</b><small>Networks</small></div>
+<div class="stat"><b>2</b><small>Services</small></div>
+<div class="stat"><b>24/7</b><small>Online access</small></div>
+</div>
+</div>
+</div>
+</section>
+
 <main>
 <div class="shop" id="buy">
-<section class="panel"><h2>Quick purchase</h2><p class="sub">Choose a service and enter the recipient's phone number.</p>
-<div class="tabs"><button class="tab active" id="dataTab" onclick="setType('data')">Buy Data</button><button class="tab" id="airtimeTab" onclick="setType('airtime')">Buy Airtime</button></div>
-<label>Choose network</label><div class="networks">
+<section class="panel">
+<h2>Quick purchase</h2>
+<p class="sub">Choose a service and enter the recipient's phone number.</p>
+<div class="tabs">
+<button class="tab active" id="dataTab" onclick="setType('data')">Buy Data</button>
+<button class="tab" id="airtimeTab" onclick="setType('airtime')">Buy Airtime</button>
+</div>
+<label>Choose network</label>
+<div class="networks">
 <button class="network active" data-net="MTN" onclick="setNetwork('MTN')"><i class="dot"></i>MTN</button>
 <button class="network" data-net="Airtel" onclick="setNetwork('Airtel')"><i class="dot"></i>Airtel</button>
 <button class="network" data-net="Glo" onclick="setNetwork('Glo')"><i class="dot"></i>Glo</button>
 <button class="network" data-net="9mobile" onclick="setNetwork('9mobile')"><i class="dot"></i>9mobile</button>
 </div>
-<label for="phone">Recipient phone number</label><input id="phone" inputmode="numeric" maxlength="11" placeholder="e.g. 08012345678">
-<div id="planWrap"><label for="plan">Select data plan</label><select id="plan" onchange="updateTotal()"><option value="300">500MB — ₦300 (sample price)</option><option value="500">1GB — ₦500 (sample price)</option><option value="950">2GB — ₦950 (sample price)</option><option value="1800">5GB — ₦1,800 (sample price)</option></select></div>
-<div id="airWrap" style="display:none"><label for="airAmount">Airtime amount (₦)</label><input id="airAmount" type="number" min="50" placeholder="Enter amount" oninput="updateTotal()"></div>
+<label for="phone">Recipient phone number</label>
+<input id="phone" inputmode="numeric" maxlength="11" placeholder="e.g. 08012345678">
+<div id="planWrap">
+<label for="plan">Select data plan</label>
+<select id="plan" onchange="updateTotal()">
+<option value="300">500MB — ₦300 (sample price)</option>
+<option value="500">1GB — ₦500 (sample price)</option>
+<option value="950">2GB — ₦950 (sample price)</option>
+<option value="1800">5GB — ₦1,800 (sample price)</option>
+</select>
+</div>
+<div id="airWrap" style="display:none">
+<label for="airAmount">Airtime amount (₦)</label>
+<input id="airAmount" type="number" min="50" placeholder="Enter amount" oninput="updateTotal()">
+</div>
 <div class="amount"><span>Estimated total</span><strong id="total">₦300</strong></div>
 <button class="primary" onclick="demoPurchase()">Continue to payment</button>
 <p class="notice">Preview only: prices are examples. Live purchases and payments are not enabled until a VTU provider API and verified payment gateway are securely connected.</p>
 </section>
-<aside class="panel" id="services"><h2>Our services</h2><p class="sub">The essentials, all in one place.</p>
+
+<aside class="panel" id="services">
+<h2>Our services</h2>
+<p class="sub">The essentials, all in one place.</p>
 <div class="service-list">
 <div class="service"><div class="icon">▤</div><div><b>Mobile data</b><small>MTN · Airtel · Glo · 9mobile</small></div></div>
 <div class="service"><div class="icon">↗</div><div><b>Airtime top-up</b><small>Recharge any supported network</small></div></div>
 <div class="service"><div class="icon">₦</div><div><b>Convenient payments</b><small>Bank transfer and card payment planned</small></div></div>
 <div class="service"><div class="icon">✓</div><div><b>Purchase assistance</b><small>Support for order enquiries</small></div></div>
 </div>
-<div id="help" style="margin-top:22px;padding:15px;background:#f5f8ff;border-radius:12px"><b style="font-size:13px">Need help?</b><p style="font-size:12px;color:#68758b;margin-bottom:0">Add your business WhatsApp number here before publishing.</p></div>
+<div id="help" style="margin-top:22px;padding:15px;background:#f5f8ff;border-radius:12px">
+<b style="font-size:13px">Need help?</b>
+<p style="font-size:12px;color:#68758b;margin-bottom:0">Add your business WhatsApp number here before publishing.</p>
+</div>
 </aside>
 </div>
 </main>
+
 <footer>© 2026 SwiftData NG · Fast Data. Easy Airtime. Reliable Service.</footer>
-<div class="modal" id="modal"><div class="modal-box"><button class="close" onclick="closeModal()">×</button><h3>Website preview</h3><p id="modalText">This is a design preview. Live payment and automatic delivery have not been connected yet.</p><button class="primary" onclick="closeModal()">Got it</button></div></div>
+
+<div class="modal" id="modal">
+<div class="modal-box">
+<button class="close" onclick="closeModal()">×</button>
+<h3>Website preview</h3>
+<p id="modalText">This is a design preview. Live payment and automatic delivery have not been connected yet.</p>
+<button class="primary" onclick="closeModal()">Got it</button>
+</div>
+</div>
+
+<div class="modal" id="authModal">
+<div class="modal-box">
+<button class="close" onclick="closeAuth()">×</button>
+<h3 id="authTitle">Welcome back</h3>
+<p id="authSubtitle">Log in to your SwiftData NG account.</p>
+<div class="auth-tabs">
+<button id="loginTab" class="active" onclick="openAuth('login')">Log in</button>
+<button id="signupTab" onclick="openAuth('signup')">Create account</button>
+</div>
+<form onsubmit="showAuthNotice(event)">
+<div id="nameField" style="display:none">
+<label for="fullName">Full name</label>
+<input id="fullName" autocomplete="name" placeholder="Enter your full name">
+</div>
+<label for="email">Email address</label>
+<input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+<div id="phoneField" style="display:none">
+<label for="accountPhone">Phone number</label>
+<input id="accountPhone" type="tel" inputmode="numeric" maxlength="11" placeholder="08012345678">
+</div>
+<label for="password">Password</label>
+<input id="password" type="password" minlength="8" placeholder="At least 8 characters" required>
+<div id="confirmField" style="display:none">
+<label for="confirmPassword">Confirm password</label>
+<input id="confirmPassword" type="password" minlength="8" placeholder="Enter password again">
+</div>
+<div id="authMessage" class="auth-message" role="status"></div>
+<button class="primary" id="authSubmit" type="submit">Log in</button>
+</form>
+<p class="auth-foot">Preview only: secure account registration and login will be activated after connecting Supabase. Do not enter or reuse a real password here.</p>
+</div>
+</div>
+
 <script>
-let type='data',network='MTN';
-function setType(t){type=t;document.getElementById('dataTab').classList.toggle('active',t==='data');document.getElementById('airtimeTab').classList.toggle('active',t==='airtime');document.getElementById('planWrap').style.display=t==='data'?'block':'none';document.getElementById('airWrap').style.display=t==='airtime'?'block':'none';updateTotal()}
-function setNetwork(n){network=n;document.querySelectorAll('.network').forEach(b=>b.classList.toggle('active',b.dataset.net===n))}
-function updateTotal(){let v=type==='data'?Number(document.getElementById('plan').value):Number(document.getElementById('airAmount').value||0);document.getElementById('total').textContent='₦'+v.toLocaleString('en-NG')}
-function demoPurchase(){let p=document.getElementById('phone').value.trim();if(!/^0[789][01]\d{8}$/.test(p)){document.getElementById('modalText').textContent='Please enter a valid 11-digit Nigerian phone number.'}else{document.getElementById('modalText').textContent='Your '+network+' '+(type==='data'?'data':'airtime')+' order preview for '+p+' is ready. This demo does not collect payment or send airtime/data. Connect a VTU API and verified Paystack checkout before accepting real orders.'}document.getElementById('modal').classList.add('show')}
-function closeModal(){document.getElementById('modal').classList.remove('show')}
+let type='data',network='MTN',authMode='login';
+
+function setType(t){
+type=t;
+document.getElementById('dataTab').classList.toggle('active',t==='data');
+document.getElementById('airtimeTab').classList.toggle('active',t==='airtime');
+document.getElementById('planWrap').style.display=t==='data'?'block':'none';
+document.getElementById('airWrap').style.display=t==='airtime'?'block':'none';
+updateTotal();
+}
+
+function setNetwork(n){
+network=n;
+document.querySelectorAll('.network').forEach(b=>b.classList.toggle('active',b.dataset.net===n));
+}
+
+function updateTotal(){
+let v=type==='data'?Number(document.getElementById('plan').value):Number(document.getElementById('airAmount').value||0);
+document.getElementById('total').textContent='₦'+v.toLocaleString('en-NG');
+}
+
+function demoPurchase(){
+let p=document.getElementById('phone').value.trim();
+document.getElementById('modalText').textContent=!/^0[789][01]\d{8}$/.test(p)
+?'Please enter a valid 11-digit Nigerian phone number.'
+:'Your '+network+' '+(type==='data'?'data':'airtime')+' order preview for '+p+' is ready. This demo does not collect payment or send airtime/data.';
+document.getElementById('modal').classList.add('show');
+}
+
+function closeModal(){
+document.getElementById('modal').classList.remove('show');
+}
+
+function openAuth(mode){
+authMode=mode;
+let s=mode==='signup';
+document.getElementById('authTitle').textContent=s?'Create your account':'Welcome back';
+document.getElementById('authSubtitle').textContent=s?'Register to get started with SwiftData NG.':'Log in to your SwiftData NG account.';
+document.getElementById('loginTab').classList.toggle('active',!s);
+document.getElementById('signupTab').classList.toggle('active',s);
+['nameField','phoneField','confirmField'].forEach(id=>document.getElementById(id).style.display=s?'block':'none');
+document.getElementById('fullName').required=s;
+document.getElementById('accountPhone').required=s;
+document.getElementById('confirmPassword').required=s;
+document.getElementById('authSubmit').textContent=s?'Create account':'Log in';
+document.getElementById('authMessage').style.display='none';
+document.getElementById('authModal').classList.add('show');
+}
+
+function closeAuth(){
+document.getElementById('authModal').classList.remove('show');
+}
+
+function showAuthNotice(e){
+e.preventDefault();
+let m=document.getElementById('authMessage');
+if(authMode==='signup'){
+if(document.getElementById('password').value!==document.getElementById('confirmPassword').value){
+m.textContent='Your passwords do not match.';
+m.style.display='block';
+return;
+}
+if(!/^0[789][01]\d{8}$/.test(document.getElementById('accountPhone').value.trim())){
+m.textContent='Enter a valid 11-digit Nigerian phone number.';
+m.style.display='block';
+return;
+}
+}
+m.textContent='The form is ready, but account creation and login are not active yet. We must connect Supabase before using real accounts. Do not enter a real password on this preview.';
+m.style.display='block';
+}
 </script>
-</body></html>
+</body>
+</html>
