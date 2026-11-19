@@ -58,7 +58,9 @@ label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}input,selec
 </div>
 <div class="notice section">This is the protected admin interface shell. It does not yet perform live customer, wallet, payment, order or pricing changes. Those actions must be implemented with secure database policies or Edge Functions before use.</div>
 </main>
-<div class="modal hidden" id="loginModal"><div class="modal-box"><div class="modal-head"><h2>Login</h2><button class="close" onclick="closeModal('loginModal')">✕</button></div><p class="muted small">Sign in with your SwiftData NG account.</p><label>Email address</label><input id="loginEmail" type="email" placeholder="you@example.com"><label>Password</label><input id="loginPassword" type="password" placeholder="Enter password"><button class="primary" style="width:100%;margin-top:18px" onclick="demoLogin()">Login</button><p class="small muted">New here? <a href="#" onclick="switchModal('loginModal','registerModal')">Create an account</a></p></div></div>
+<div class="modal hidden" id="loginModal"><div class="modal-box"><div class="modal-head"><h2>Login</h2><button class="close" onclick="closeModal('loginModal')">✕</button></div><p class="muted small">Sign in with your SwiftData NG account.</p><label>Email address</label><input id="loginEmail" type="email" placeholder="you@example.com"><label>Password</label><input id="loginPassword" type="password" placeholder="Enter password"><button class="primary" style="width:100%;margin-top:18px" onclick="demoLogin()">Login</button><p class="small muted"><a href="#" onclick="event.preventDefault();document.getElementById('forgotEmail').value=document.getElementById('loginEmail').value.trim();switchModal('loginModal','forgotModal')">Forgot password?</a></p><p class="small muted">New here? <a href="#" onclick="switchModal('loginModal','registerModal')">Create an account</a></p></div></div>
+<div class="modal hidden" id="forgotModal"><div class="modal-box"><div class="modal-head"><h2>Reset password</h2><button class="close" onclick="closeModal('forgotModal')">✕</button></div><p class="muted small">Enter the email address linked to your SwiftData NG account. We will send you a password-reset link.</p><label>Email address</label><input id="forgotEmail" type="email" placeholder="you@example.com"><button class="primary" style="width:100%;margin-top:18px" onclick="sendPasswordReset()">Send reset link</button><p class="small muted"><a href="#" onclick="event.preventDefault();switchModal('forgotModal','loginModal')">Back to login</a></p></div></div>
+<div class="modal hidden" id="newPasswordModal"><div class="modal-box"><div class="modal-head"><h2>Choose a new password</h2></div><p class="muted small">Enter a new password for your SwiftData NG account.</p><label>New password</label><input id="newPassword" type="password" placeholder="At least 6 characters"><label>Confirm new password</label><input id="confirmNewPassword" type="password" placeholder="Enter it again"><button class="primary" style="width:100%;margin-top:18px" onclick="saveNewPassword()">Save new password</button></div></div>
 <div class="modal hidden" id="adminLoginModal"><div class="modal-box"><div class="modal-head"><h2>Administrator Login</h2><button class="close" onclick="closeModal('adminLoginModal')">✕</button></div><p class="muted small">For authorised SwiftData NG administrators only.</p><label>Admin email</label><input id="adminEmailInput" type="email" placeholder="Administrator email"><label>Password</label><input id="adminPasswordInput" type="password" placeholder="Your account password"><button class="primary" style="width:100%;margin-top:18px" onclick="adminLogin()">Secure Admin Login</button><p class="small muted">Access is checked against the admin_users table in Supabase.</p></div></div>
 <div class="modal hidden" id="registerModal"><div class="modal-box"><div class="modal-head"><h2>Create account</h2><button class="close" onclick="closeModal('registerModal')">✕</button></div><p class="muted small">Create your account using Supabase authentication.</p><label>Full name</label><input id="regName" placeholder="Enter your full name"><label>Email address</label><input id="regEmail" type="email" placeholder="you@example.com"><label>Phone number</label><input id="regPhone" inputmode="tel" placeholder="08012345678"><label>Password</label><input id="regPassword" type="password" placeholder="Create a password"><button class="primary" style="width:100%;margin-top:18px" onclick="demoRegister()">Create account</button><p class="small muted">Already registered? <a href="#" onclick="switchModal('registerModal','loginModal')">Login</a></p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -66,41 +68,73 @@ label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}input,selec
 const SUPABASE_URL = "https://abhfvhdeaantgtnsdgkq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_A9DIs_Hsqd95VrQkiBJpXQ_hbwbPHay";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-let selectedPlan=null,currentUser=null;
+let selectedPlan=null,currentUser=null,passwordRecoveryInProgress=false;
 document.getElementById('year').textContent=new Date().getFullYear();
-(async function restoreSession(){
-  const {data:{session}}=await supabaseClient.auth.getSession();
-  if(session){
-    currentUser={name:session.user.user_metadata?.full_name||'Customer',email:session.user.email};
-    enterDashboard();
+
+supabaseClient.auth.onAuthStateChange((event) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    passwordRecoveryInProgress = true;
+    ['home','dashboard','admin'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    openModal('newPasswordModal');
   }
-})();
-function openModal(id){document.getElementById(id).classList.remove('hidden')}
-function closeModal(id){document.getElementById(id).classList.add('hidden')}
-function switchModal(a,b){closeModal(a);openModal(b)}
-function showOnly(id){['home','dashboard','admin'].forEach(x=>document.getElementById(x).classList.add('hidden'));document.getElementById(id).classList.remove('hidden');window.scrollTo(0,0)}
-function openAdminLogin(){openModal('adminLoginModal')}
-async function adminLogin(){
-  const email=document.getElementById('adminEmailInput').value.trim();
-  const password=document.getElementById('adminPasswordInput').value;
-  if(!email||!password){alert('Enter your administrator email and password.');return}
-  const button=document.querySelector('#adminLoginModal .primary');
-  button.disabled=true;button.textContent='Checking access...';
-  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
-  if(error){button.disabled=false;button.textContent='Secure Admin Login';alert('Admin login failed: '+error.message);return}
-  // The database function checks auth.uid() against admin_users.
-  const {data:isAdmin,error:roleError}=await supabaseClient.rpc('is_admin');
-  if(roleError||isAdmin!==true){
-    await supabaseClient.auth.signOut();
-    button.disabled=false;button.textContent='Secure Admin Login';
-    alert('This account is not authorised as an administrator. Customer access remains separate.');
+});
+
+async function sendPasswordReset(){
+  const email=document.getElementById('forgotEmail').value.trim();
+  const emailInput=document.getElementById('forgotEmail');
+  if(!email || !emailInput.checkValidity()){
+    alert('Enter a valid email address.');
     return;
   }
-  currentUser={name:data.user.user_metadata?.full_name||'Administrator',email:data.user.email};
-  document.getElementById('adminEmail').textContent=data.user.email;
-  button.disabled=false;button.textContent='Secure Admin Login';
-  closeModal('adminLoginModal');showOnly('admin');
+  const button=document.querySelector('#forgotModal .primary');
+  button.disabled=true;
+  button.textContent='Sending...';
+  try {
+    const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{
+      redirectTo: window.location.origin + window.location.pathname
+    });
+    if(error) throw error;
+    closeModal('forgotModal');
+    alert('If this email belongs to an account, a password-reset link will be sent. Check your inbox and Spam folder.');
+  } catch(error) {
+    alert('Could not send reset link: '+(error.message || 'Please try again.'));
+  } finally {
+    button.disabled=false;
+    button.textContent='Send reset link';
+  }
 }
+
+async function saveNewPassword(){
+  const password=document.getElementById('newPassword').value;
+  const confirm=document.getElementById('confirmNewPassword').value;
+  if(password.length<6){
+    alert('Use a password with at least 6 characters.');
+    return;
+  }
+  if(password!==confirm){
+    alert('The passwords do not match.');
+    return;
+  }
+  const button=document.querySelector('#newPasswordModal .primary');
+  button.disabled=true;
+  button.textContent='Saving...';
+  try {
+    const {error}=await supabaseClient.auth.updateUser({password});
+    if(error) throw error;
+    closeModal('newPasswordModal');
+    await supabaseClient.auth.signOut();
+    passwordRecoveryInProgress=false;
+    alert('Your password has been changed. Please log in with your new password.');
+    showOnly('home');
+    openModal('loginModal');
+  } catch(error) {
+    alert('Could not update password: '+(error.message || 'Please try again.'));
+  } finally {
+    button.disabled=false;
+    button.textContent='Save new password';
+  }
+}
+
 async function demoRegister(){
   const name=document.getElementById('regName').value.trim();
   const email=document.getElementById('regEmail').value.trim();
