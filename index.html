@@ -168,11 +168,11 @@ async function refreshWallet(){
   if(!balanceEl||!messageEl)return;
   const {data:{user},error:userError}=await supabaseClient.auth.getUser();
   if(userError||!user){messageEl.textContent='Please sign in again to view your wallet.';return;}
-  // Your Supabase wallet schema: public.wallets(user_id, balance)
+  // Your confirmed Supabase wallet schema: public.wallets(id, balance). The wallet id matches auth.users.id.
   const {data,error}=await supabaseClient
     .from('wallets')
     .select('balance')
-    .eq('user_id',user.id)
+    .eq('id',user.id)
     .maybeSingle();
 
   if(error){
