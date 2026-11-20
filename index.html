@@ -96,7 +96,22 @@ async function placeOrder(type){
  const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();if(sessionError||!session){alert('Please sign in again before placing an order.');return;}
  const button=document.querySelector(`#page-buy${type==='data'?'data':'airtime'} .primary`);button.disabled=true;button.textContent='Submitting order...';
  try{const {data,error}=await supabaseClient.functions.invoke('vtu-purchase',{body:{type,network:normalizedNetwork,phone,amount,variation_code:type==='data'?selectedPlan.variationCode:null,idempotency_key:crypto.randomUUID()},headers:{Authorization:`Bearer ${session.access_token}`}});if(error)throw error;if(!data?.success)throw new Error(data?.message||data?.error||'The provider has not confirmed this order.');alert(data.status==='completed'?'Your order was completed successfully.':'Your order is being processed. Check Transactions for updates.');await refreshWallet();}
- catch(error){console.error('VTU purchase failed:',error);alert('Order could not be confirmed: '+(error.message||'Please contact support before trying again.'));}
+ catch(error){
+  console.error('VTU purchase failed:',error);
+  let detail=error?.message||'Unknown purchase error';
+  try{
+    if(error?.context&&typeof error.context.clone==='function'){
+      const responseText=await error.context.clone().text();
+      if(responseText){
+        try{
+          const result=JSON.parse(responseText);
+          detail=result.message||result.error||result.details||responseText;
+        }catch{detail=responseText;}
+      }
+    }
+  }catch(readError){console.error('Could not read detailed purchase error:',readError);}
+  alert('Purchase failed: '+detail+'\n\nDo not retry if an order may already be processing.');
+}
  finally{button.disabled=false;button.textContent=type==='data'?'Buy data':'Buy airtime';}
 }
 function quickStart(){const phone=document.getElementById('quickPhone').value;if(!/^0\d{10}$/.test(phone)){alert('Enter a valid 11-digit Nigerian phone number.');return;}openModal('loginModal');}
