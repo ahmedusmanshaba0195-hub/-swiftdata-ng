@@ -26,7 +26,7 @@ label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}input,selec
 <section id="page-buydata" class="dash-page hidden"><div class="card"><h3>Buy data</h3><label>Network</label><select id="dataNetwork" onchange="loadDataPlans()"><option>MTN</option><option>Airtel</option><option>Glo</option><option>9mobile</option></select><label>Phone number</label><input id="dataPhone" placeholder="08012345678" inputmode="tel"><label>Choose plan</label><div id="dataPlansStatus" class="notice">Select a network to load available data plans.</div><div id="dataPlansContainer" class="plans"></div><button class="primary" style="margin-top:16px" onclick="placeOrder('data')">Buy data</button></div></section>
 <section id="page-buyairtime" class="dash-page hidden"><div class="card"><h3>Buy airtime</h3><label>Network</label><select id="airNetwork"><option>MTN</option><option>Airtel</option><option>Glo</option><option>9mobile</option></select><label>Phone number</label><input id="airPhone" placeholder="08012345678" inputmode="tel"><label>Amount (₦)</label><input id="airAmount" type="number" min="50" placeholder="Enter amount"><button class="primary" style="margin-top:16px" onclick="placeOrder('airtime')">Buy airtime</button></div></section>
 <section id="page-wallet" class="dash-page hidden"><div class="card"><h3>My wallet</h3><p class="muted">Available balance</p><h2 id="walletBalance">₦0.00</h2><div id="walletMessage" class="notice">Your wallet balance is retrieved from your SwiftData NG account.</div><label for="fundAmount">Amount to add (NGN)</label><input id="fundAmount" type="number" min="100" max="1000000" step="1" placeholder="Enter amount (minimum ₦100)"><button id="fundWalletButton" class="primary" style="margin-top:14px" onclick="fundWallet()">Fund wallet with Paystack</button><button class="secondary" style="margin:14px 0 0 8px" onclick="refreshWallet()">Refresh balance</button><p class="small muted">Your wallet is credited only after Paystack confirms successful payment through the server-side webhook.</p></div></section>
-<section id="page-history" class="dash-page hidden"><div class="card"><div class="section-title"><h3>Transaction history</h3><button class="secondary" type="button" onclick="loadTransactionHistory()">Refresh</button></div><div id="historyMessage" class="muted small" aria-live="polite">Your purchases will appear here.</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Details</th><th>Amount</th><th>Status</th></tr></thead><tbody id="historyRows"><tr><td colspan="5" class="muted">No transactions yet.</td></tr></tbody></table></div></div></section>
+<section id="page-history" class="dash-page hidden"><div class="card"><h3>Transaction history</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Details</th><th>Amount</th><th>Status</th></tr></thead><tbody id="historyRows"><tr><td colspan="5" class="muted">No transactions yet.</td></tr></tbody></table></div></div></section>
 <section id="page-profile" class="dash-page hidden"><div class="card"><h3>My profile</h3><label>Full name</label><input id="profileName" placeholder="Your full name"><label>Email address</label><input id="profileEmail" readonly><label>Phone number</label><input id="profilePhone" placeholder="Your phone number" inputmode="tel"><button class="primary" style="margin-top:14px" onclick="saveProfile()">Save changes</button></div></section>
 </div></div></main>
 <main id="admin" class="hidden"><div class="section-title"><div><h2>SwiftData NG Admin Dashboard</h2><span class="muted small" id="adminEmail"></span></div><button class="danger" onclick="logout()">Admin Logout</button></div><div class="notice success">Administrator access verified by Supabase.</div><div class="stats section"><div class="stat">Customers<strong>—</strong><span class="small muted">Connect customer data query</span></div><div class="stat">Orders<strong>—</strong><span class="small muted">Connect orders table</span></div><div class="stat">Sales<strong>—</strong><span class="small muted">Connect verified payments</span></div><div class="stat">Pending<strong>—</strong><span class="small muted">Connect pending orders</span></div></div><div class="grid section"><div class="card"><h3>Customers</h3><p class="muted">Customer management interface. Live records require verified database queries and policies.</p></div><div class="card"><h3>Orders</h3><p class="muted">Review data and airtime orders after orders-table integration.</p></div><div class="card"><h3>Wallets & payments</h3><p class="muted">Wallet funding and adjustments must use secure server-side functions.</p></div><div class="card"><h3>Services & pricing</h3><p class="muted">Manage plans after admin-only database actions are implemented.</p></div><div class="card"><h3>Transactions</h3><p class="muted">View payment records after payment verification is connected.</p></div><div class="card"><h3>Reports</h3><p class="muted">Sales reports will populate when real transaction data is connected.</p></div></div><div class="notice section">Administrator reporting and management actions require protected database queries and server-side functions.</div></main>
@@ -61,45 +61,7 @@ async function refreshWallet(){const balanceEl=document.getElementById('walletBa
 async function fundWallet(){const amount=Number(document.getElementById('fundAmount').value),button=document.getElementById('fundWalletButton'),messageEl=document.getElementById('walletMessage');if(!Number.isFinite(amount)||amount<100||amount>1000000){messageEl.textContent='Enter an amount between ₦100 and ₦1,000,000.';return;}const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();if(sessionError||!session){messageEl.textContent='Your login session has expired. Please log in again.';return;}button.disabled=true;button.textContent='Connecting to Paystack...';messageEl.textContent='Creating your secure payment. Please wait.';try{const {data,error}=await supabaseClient.functions.invoke('paystack-initialize',{body:{amount},headers:{Authorization:`Bearer ${session.access_token}`}});if(error)throw error;if(!data?.success||!data?.authorization_url)throw new Error(data?.message||data?.error||'Paystack did not return a checkout link.');messageEl.textContent='Opening Paystack secure checkout...';window.location.assign(data.authorization_url);}catch(error){console.error(error);messageEl.textContent='Could not start payment: '+error.message;button.disabled=false;button.textContent='Fund wallet with Paystack';}}
 async function saveProfile(){const name=document.getElementById('profileName').value.trim(),phone=document.getElementById('profilePhone').value.trim();if(!name){alert('Enter your full name.');return;}if(phone&&!/^0\d{10}$/.test(phone)){alert('Enter a valid 11-digit Nigerian phone number.');return;}const {error}=await supabaseClient.auth.updateUser({data:{full_name:name,phone}});if(error){alert('Could not update profile: '+error.message);return;}currentUser={...currentUser,name,phone};document.getElementById('welcome').textContent='Welcome, '+name;alert('Profile updated successfully.');}
 async function logout(){await supabaseClient.auth.signOut();currentUser=null;showOnly('home');}
-async function loadTransactionHistory(){
- const rows=document.getElementById('historyRows');
- const message=document.getElementById('historyMessage');
- if(!rows||!message)return;
- rows.innerHTML='<tr><td colspan="5" class="muted">Loading transactions...</td></tr>';
- message.textContent='';
- try{
-  const {data:{user},error:userError}=await supabaseClient.auth.getUser();
-  if(userError||!user)throw new Error('Your session has expired. Please log in again.');
-  const {data,error}=await supabaseClient
-   .from('vtu_orders')
-   .select('id,product_type,network,phone,amount,variation_code,status,created_at')
-   .eq('user_id',user.id)
-   .order('created_at',{ascending:false});
-  if(error)throw error;
-  rows.innerHTML='';
-  if(!data||data.length===0){
-   rows.innerHTML='<tr><td colspan="5" class="muted">No transactions yet.</td></tr>';
-   message.textContent='No VTU purchases have been saved for this account yet.';
-   return;
-  }
-  data.forEach(order=>{
-   const row=document.createElement('tr');
-   const date=order.created_at?new Date(order.created_at).toLocaleString():'—';
-   const network=String(order.network||'').toUpperCase();
-   const details=[network,order.phone||'',order.variation_code||''].filter(Boolean).join(' · ')||'—';
-   const amount=Number(order.amount);
-   const values=[date,String(order.product_type||'—').toUpperCase(),details,Number.isFinite(amount)?naira(amount):'—',String(order.status||'processing').toUpperCase()];
-   values.forEach(value=>{const cell=document.createElement('td');cell.textContent=value;row.appendChild(cell);});
-   rows.appendChild(row);
-  });
-  message.textContent=`Showing ${data.length} saved purchase${data.length===1?'':'s'}.`;
- }catch(error){
-  console.error('Transaction history error:',error);
-  rows.innerHTML='<tr><td colspan="5" class="muted">Could not load transactions. Please refresh and try again.</td></tr>';
-  message.textContent=error.message||'There was a problem loading your transactions.';
- }
-}
-function showPage(page,btn){document.querySelectorAll('.dash-page').forEach(x=>x.classList.add('hidden'));const target=document.getElementById('page-'+page);if(!target)return;target.classList.remove('hidden');document.querySelectorAll('.side-btn').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');if(page==='buydata')loadDataPlans();if(page==='history')loadTransactionHistory();}
+function showPage(page,btn){document.querySelectorAll('.dash-page').forEach(x=>x.classList.add('hidden'));document.getElementById('page-'+page).classList.remove('hidden');document.querySelectorAll('.side-btn').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');if(page==='buydata')loadDataPlans();}
 
 /* The catalogue is fetched from your deployed vtu-data-plans Edge Function.
    No sample plan prices or made-up variation codes are used. */
