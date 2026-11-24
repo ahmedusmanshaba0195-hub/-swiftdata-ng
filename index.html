@@ -26,10 +26,25 @@ label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}input,selec
 <section id="page-buydata" class="dash-page hidden"><div class="card"><h3>Buy data</h3><label>Network</label><select id="dataNetwork" onchange="loadDataPlans()"><option>MTN</option><option>Airtel</option><option>Glo</option><option>9mobile</option></select><label>Phone number</label><input id="dataPhone" placeholder="08012345678" inputmode="tel"><label>Choose plan</label><div id="dataPlansStatus" class="notice">Select a network to load available data plans.</div><div id="dataPlansContainer" class="plans"></div><button class="primary" style="margin-top:16px" onclick="placeOrder('data')">Buy data</button></div></section>
 <section id="page-buyairtime" class="dash-page hidden"><div class="card"><h3>Buy airtime</h3><label>Network</label><select id="airNetwork"><option>MTN</option><option>Airtel</option><option>Glo</option><option>9mobile</option></select><label>Phone number</label><input id="airPhone" placeholder="08012345678" inputmode="tel"><label>Amount (₦)</label><input id="airAmount" type="number" min="50" placeholder="Enter amount"><button class="primary" style="margin-top:16px" onclick="placeOrder('airtime')">Buy airtime</button></div></section>
 <section id="page-wallet" class="dash-page hidden"><div class="card"><h3>My wallet</h3><p class="muted">Available balance</p><h2 id="walletBalance">₦0.00</h2><div id="walletMessage" class="notice">Your wallet balance is retrieved from your SwiftData NG account.</div><label for="fundAmount">Amount to add (NGN)</label><input id="fundAmount" type="number" min="100" max="1000000" step="1" placeholder="Enter amount (minimum ₦100)"><button id="fundWalletButton" class="primary" style="margin-top:14px" onclick="fundWallet()">Fund wallet with Paystack</button><button class="secondary" style="margin:14px 0 0 8px" onclick="refreshWallet()">Refresh balance</button><p class="small muted">Your wallet is credited only after Paystack confirms successful payment through the server-side webhook.</p></div></section>
-<section id="page-history" class="dash-page hidden"><div class="card"><h3>Transaction history</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Details</th><th>Amount</th><th>Status</th></tr></thead><tbody id="historyRows"><tr><td colspan="5" class="muted">No transactions yet.</td></tr></tbody></table></div></div></section>
+<section id="page-history" class="dash-page hidden"><div class="card"><div class="section-title"><h3>Transaction history</h3><button class="secondary" type="button" onclick="loadTransactionHistory()">Refresh</button></div><div id="historyMessage" class="muted small" aria-live="polite">Your purchases will appear here.</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Details</th><th>Amount</th><th>Status</th></tr></thead><tbody id="historyRows"><tr><td colspan="5" class="muted">No transactions yet.</td></tr></tbody></table></div></div></section>
 <section id="page-profile" class="dash-page hidden"><div class="card"><h3>My profile</h3><label>Full name</label><input id="profileName" placeholder="Your full name"><label>Email address</label><input id="profileEmail" readonly><label>Phone number</label><input id="profilePhone" placeholder="Your phone number" inputmode="tel"><button class="primary" style="margin-top:14px" onclick="saveProfile()">Save changes</button></div></section>
 </div></div></main>
-<main id="admin" class="hidden"><div class="section-title"><div><h2>SwiftData NG Admin Dashboard</h2><span class="muted small" id="adminEmail"></span></div><button class="danger" onclick="logout()">Admin Logout</button></div><div class="notice success">Administrator access verified by Supabase.</div><div class="stats section"><div class="stat">Customers<strong>—</strong><span class="small muted">Connect customer data query</span></div><div class="stat">Orders<strong>—</strong><span class="small muted">Connect orders table</span></div><div class="stat">Sales<strong>—</strong><span class="small muted">Connect verified payments</span></div><div class="stat">Pending<strong>—</strong><span class="small muted">Connect pending orders</span></div></div><div class="grid section"><div class="card"><h3>Customers</h3><p class="muted">Customer management interface. Live records require verified database queries and policies.</p></div><div class="card"><h3>Orders</h3><p class="muted">Review data and airtime orders after orders-table integration.</p></div><div class="card"><h3>Wallets & payments</h3><p class="muted">Wallet funding and adjustments must use secure server-side functions.</p></div><div class="card"><h3>Services & pricing</h3><p class="muted">Manage plans after admin-only database actions are implemented.</p></div><div class="card"><h3>Transactions</h3><p class="muted">View payment records after payment verification is connected.</p></div><div class="card"><h3>Reports</h3><p class="muted">Sales reports will populate when real transaction data is connected.</p></div></div><div class="notice section">Administrator reporting and management actions require protected database queries and server-side functions.</div></main>
+<main id="admin" class="hidden">
+<div class="section-title"><div><h2>SwiftData NG Admin Dashboard</h2><span class="muted small" id="adminEmail"></span></div><button class="danger" onclick="logout()">Admin Logout</button></div>
+<div class="notice success">Administrator access verified by Supabase.</div>
+<div class="stats section">
+  <div class="stat">Total VTU orders<strong id="adminTotalOrders">—</strong></div>
+  <div class="stat">Completed<strong id="adminCompletedOrders">—</strong></div>
+  <div class="stat">Processing<strong id="adminPendingOrders">—</strong></div>
+  <div class="stat">Failed / refunded<strong id="adminFailedOrders">—</strong></div>
+</div>
+<section class="card section">
+  <div class="section-title"><div><h3>All customer VTU transactions</h3><span class="muted small">Airtime and data purchases recorded in the purchase ledger.</span></div><button class="secondary" type="button" onclick="loadAdminTransactions()">Refresh</button></div>
+  <div id="adminHistoryMessage" class="muted small" aria-live="polite">Loading administrator transaction records...</div>
+  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Customer ID</th><th>Type</th><th>Network / Phone</th><th>Amount</th><th>Status</th><th>Provider reference</th></tr></thead><tbody id="adminHistoryRows"><tr><td colspan="7">No records loaded.</td></tr></tbody></table></div>
+</section>
+<div class="notice section">Admin transaction access is controlled by Supabase Row Level Security. If the table query is denied, add an admin-only SELECT policy; do not disable RLS or expose the service-role key in this website.</div>
+</main>
 <div class="modal hidden" id="loginModal"><div class="modal-box"><div class="modal-head"><h2>Login</h2><button class="close" onclick="closeModal('loginModal')">✕</button></div><p class="muted small">Sign in with your SwiftData NG account.</p><label>Email address</label><input id="loginEmail" type="email" placeholder="you@example.com"><label>Password</label><input id="loginPassword" type="password" placeholder="Enter password"><button class="primary" style="width:100%;margin-top:18px" onclick="loginCustomer()">Login</button><p class="small"><a href="#" onclick="event.preventDefault();resetPassword()">Forgot password?</a></p><p class="small muted">New here? <a href="#" onclick="switchModal('loginModal','registerModal')">Create an account</a></p></div></div>
 <div class="modal hidden" id="adminLoginModal"><div class="modal-box"><div class="modal-head"><h2>Administrator Login</h2><button class="close" onclick="closeModal('adminLoginModal')">✕</button></div><p class="muted small">For authorised SwiftData NG administrators only.</p><label>Admin email</label><input id="adminEmailInput" type="email" placeholder="Administrator email"><label>Password</label><input id="adminPasswordInput" type="password" placeholder="Your account password"><button class="primary" style="width:100%;margin-top:18px" onclick="adminLogin()">Secure Admin Login</button><p class="small muted">Access is checked against the admin_users table in Supabase.</p></div></div>
 <div class="modal hidden" id="registerModal"><div class="modal-box"><div class="modal-head"><h2>Create account</h2><button class="close" onclick="closeModal('registerModal')">✕</button></div><p class="muted small">Create your account using Supabase authentication.</p><label>Full name</label><input id="regName" placeholder="Enter your full name"><label>Email address</label><input id="regEmail" type="email" placeholder="you@example.com"><label>Phone number</label><input id="regPhone" inputmode="tel" placeholder="08012345678"><label>Password</label><input id="regPassword" type="password" placeholder="Create a password"><button class="primary" style="width:100%;margin-top:18px" onclick="registerCustomer()">Create account</button><p class="small muted">Already registered? <a href="#" onclick="switchModal('registerModal','loginModal')">Login</a></p></div></div>
@@ -52,7 +67,7 @@ function closeModal(id){document.getElementById(id).classList.add('hidden');}
 function switchModal(a,b){closeModal(a);openModal(b);}
 function showOnly(id){['home','dashboard','admin'].forEach(x=>document.getElementById(x).classList.add('hidden'));document.getElementById(id).classList.remove('hidden');window.scrollTo(0,0);}
 function openAdminLogin(){openModal('adminLoginModal');}
-async function adminLogin(){const email=document.getElementById('adminEmailInput').value.trim(),password=document.getElementById('adminPasswordInput').value;if(!email||!password){alert('Enter your administrator email and password.');return;}const button=document.querySelector('#adminLoginModal .primary');button.disabled=true;button.textContent='Checking access...';try{const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});if(error)throw error;const {data:isAdmin,error:roleError}=await supabaseClient.rpc('is_admin');if(roleError)throw new Error('Signed in, but admin permission check failed: '+roleError.message);if(isAdmin!==true){await supabaseClient.auth.signOut();throw new Error('This account is not authorised as an administrator.');}currentUser={name:data.user.user_metadata?.full_name||'Administrator',email:data.user.email};document.getElementById('adminEmail').textContent=data.user.email;closeModal('adminLoginModal');showOnly('admin');}catch(error){alert('Admin login failed: '+error.message);}finally{button.disabled=false;button.textContent='Secure Admin Login';}}
+async function adminLogin(){const email=document.getElementById('adminEmailInput').value.trim(),password=document.getElementById('adminPasswordInput').value;if(!email||!password){alert('Enter your administrator email and password.');return;}const button=document.querySelector('#adminLoginModal .primary');button.disabled=true;button.textContent='Checking access...';try{const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});if(error)throw error;const {data:isAdmin,error:roleError}=await supabaseClient.rpc('is_admin');if(roleError)throw new Error('Signed in, but admin permission check failed: '+roleError.message);if(isAdmin!==true){await supabaseClient.auth.signOut();throw new Error('This account is not authorised as an administrator.');}currentUser={name:data.user.user_metadata?.full_name||'Administrator',email:data.user.email};document.getElementById('adminEmail').textContent=data.user.email;closeModal('adminLoginModal');showOnly('admin');await loadAdminTransactions();}catch(error){alert('Admin login failed: '+error.message);}finally{button.disabled=false;button.textContent='Secure Admin Login';}}
 async function registerCustomer(){const name=document.getElementById('regName').value.trim(),email=document.getElementById('regEmail').value.trim(),phone=document.getElementById('regPhone').value.trim(),password=document.getElementById('regPassword').value;if(!name||!email||!password){alert('Please enter your name, email and password.');return;}if(password.length<6){alert('Please use a password with at least 6 characters.');return;}const button=document.querySelector('#registerModal .primary');button.disabled=true;button.textContent='Creating account...';try{const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{full_name:name,phone}}});if(error)throw error;closeModal('registerModal');if(data.session&&data.user){currentUser={name:data.user.user_metadata?.full_name||name,email:data.user.email||email,phone};await enterDashboard();}else{openModal('loginModal');showAuthMessage('Account created. Check your email and confirm your address before logging in.',true);}}catch(error){alert('Registration failed: '+error.message);}finally{button.disabled=false;button.textContent='Create account';}}
 async function loginCustomer(){const email=document.getElementById('loginEmail').value.trim(),password=document.getElementById('loginPassword').value;if(!email||!password){showAuthMessage('Please enter your email address and password.');return;}const button=document.querySelector('#loginModal .primary');button.disabled=true;button.textContent='Signing in...';clearAuthMessage();try{const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});if(error)throw error;if(!data?.user)throw new Error('Supabase did not return a user account.');currentUser={name:data.user.user_metadata?.full_name||'Customer',email:data.user.email||email,phone:data.user.user_metadata?.phone||''};closeModal('loginModal');await enterDashboard();}catch(error){showAuthMessage('Login failed: '+error.message);}finally{button.disabled=false;button.textContent='Login';}}
 async function resetPassword(){const email=document.getElementById('loginEmail').value.trim();if(!email){showAuthMessage('Enter your email address first, then choose Forgot password.');return;}try{const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname});if(error)throw error;showAuthMessage('Password reset email sent. Check your inbox.',true);}catch(error){showAuthMessage('Could not send reset email: '+error.message);}}
@@ -61,7 +76,96 @@ async function refreshWallet(){const balanceEl=document.getElementById('walletBa
 async function fundWallet(){const amount=Number(document.getElementById('fundAmount').value),button=document.getElementById('fundWalletButton'),messageEl=document.getElementById('walletMessage');if(!Number.isFinite(amount)||amount<100||amount>1000000){messageEl.textContent='Enter an amount between ₦100 and ₦1,000,000.';return;}const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();if(sessionError||!session){messageEl.textContent='Your login session has expired. Please log in again.';return;}button.disabled=true;button.textContent='Connecting to Paystack...';messageEl.textContent='Creating your secure payment. Please wait.';try{const {data,error}=await supabaseClient.functions.invoke('paystack-initialize',{body:{amount},headers:{Authorization:`Bearer ${session.access_token}`}});if(error)throw error;if(!data?.success||!data?.authorization_url)throw new Error(data?.message||data?.error||'Paystack did not return a checkout link.');messageEl.textContent='Opening Paystack secure checkout...';window.location.assign(data.authorization_url);}catch(error){console.error(error);messageEl.textContent='Could not start payment: '+error.message;button.disabled=false;button.textContent='Fund wallet with Paystack';}}
 async function saveProfile(){const name=document.getElementById('profileName').value.trim(),phone=document.getElementById('profilePhone').value.trim();if(!name){alert('Enter your full name.');return;}if(phone&&!/^0\d{10}$/.test(phone)){alert('Enter a valid 11-digit Nigerian phone number.');return;}const {error}=await supabaseClient.auth.updateUser({data:{full_name:name,phone}});if(error){alert('Could not update profile: '+error.message);return;}currentUser={...currentUser,name,phone};document.getElementById('welcome').textContent='Welcome, '+name;alert('Profile updated successfully.');}
 async function logout(){await supabaseClient.auth.signOut();currentUser=null;showOnly('home');}
-function showPage(page,btn){document.querySelectorAll('.dash-page').forEach(x=>x.classList.add('hidden'));document.getElementById('page-'+page).classList.remove('hidden');document.querySelectorAll('.side-btn').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');if(page==='buydata')loadDataPlans();}
+async function loadTransactionHistory(){
+ const rows=document.getElementById('historyRows');
+ const message=document.getElementById('historyMessage');
+ if(!rows||!message)return;
+ rows.innerHTML='<tr><td colspan="5" class="muted">Loading transactions...</td></tr>';
+ message.textContent='';
+ try{
+  const {data:{user},error:userError}=await supabaseClient.auth.getUser();
+  if(userError||!user)throw new Error('Your session has expired. Please log in again.');
+  const {data,error}=await supabaseClient
+   .from('vtu_purchase_ledger')
+   .select('id,product_type,network,phone,amount,variation_code,status,created_at,idempotency_key,provider_reference,failure_reason')
+   .eq('user_id',user.id)
+   .order('created_at',{ascending:false});
+  if(error)throw error;
+  rows.innerHTML='';
+  if(!data||data.length===0){
+   rows.innerHTML='<tr><td colspan="5" class="muted">No transactions yet.</td></tr>';
+   message.textContent='No VTU purchases have been saved for this account yet.';
+   return;
+  }
+  data.forEach(order=>{
+   const row=document.createElement('tr');
+   const date=order.created_at?new Date(order.created_at).toLocaleString():'—';
+   const network=String(order.network||'').toUpperCase();
+   const details=[network,order.phone||'',order.variation_code||'',order.provider_reference||order.idempotency_key||''].filter(Boolean).join(' · ')||'—';
+   const amount=Number(order.amount);
+   const values=[date,String(order.product_type||'—').toUpperCase(),details,Number.isFinite(amount)?naira(amount):'—',String(order.status||'processing').toUpperCase()];
+   values.forEach(value=>{const cell=document.createElement('td');cell.textContent=value;row.appendChild(cell);});
+   rows.appendChild(row);
+  });
+  message.textContent=`Showing ${data.length} saved purchase${data.length===1?'':'s'}.`;
+ }catch(error){
+  console.error('Transaction history error:',error);
+  rows.innerHTML='<tr><td colspan="5" class="muted">Could not load transactions. Please refresh and try again.</td></tr>';
+  message.textContent=error.message||'There was a problem loading your transactions.';
+ }
+}
+
+async function loadAdminTransactions(){
+ const rows=document.getElementById('adminHistoryRows');
+ const message=document.getElementById('adminHistoryMessage');
+ if(!rows||!message)return;
+ rows.innerHTML='<tr><td colspan="7">Loading transactions...</td></tr>';
+ message.textContent='';
+ try{
+  // Re-check the caller's admin role before requesting all customer records.
+  const {data:isAdmin,error:roleError}=await supabaseClient.rpc('is_admin');
+  if(roleError)throw new Error('Could not verify administrator permission: '+roleError.message);
+  if(isAdmin!==true)throw new Error('Administrator access is required.');
+  const {data,error}=await supabaseClient
+   .from('vtu_purchase_ledger')
+   .select('id,user_id,product_type,network,phone,amount,status,created_at,provider_reference')
+   .order('created_at',{ascending:false})
+   .limit(500);
+  if(error)throw error;
+  const records=data||[];
+  document.getElementById('adminTotalOrders').textContent=records.length;
+  document.getElementById('adminCompletedOrders').textContent=records.filter(x=>x.status==='completed').length;
+  document.getElementById('adminPendingOrders').textContent=records.filter(x=>x.status==='processing'||x.status==='pending').length;
+  document.getElementById('adminFailedOrders').textContent=records.filter(x=>x.status==='failed'||x.status==='refunded').length;
+  rows.replaceChildren();
+  if(!records.length){
+   rows.innerHTML='<tr><td colspan="7">No VTU transactions found.</td></tr>';
+   message.textContent='No purchase records were returned.';
+   return;
+  }
+  records.forEach(item=>{
+   const tr=document.createElement('tr');
+   const values=[
+    item.created_at?new Date(item.created_at).toLocaleString():'—',
+    item.user_id||'—',
+    String(item.product_type||'—').toUpperCase(),
+    `${String(item.network||'').toUpperCase()} / ${item.phone||'—'}`,
+    Number.isFinite(Number(item.amount))?naira(Number(item.amount)):'—',
+    String(item.status||'—').toUpperCase(),
+    item.provider_reference||'—'
+   ];
+   values.forEach(value=>{const td=document.createElement('td');td.textContent=String(value);tr.appendChild(td);});
+   rows.appendChild(tr);
+  });
+  message.textContent=`Showing ${records.length} most recent transaction record(s).`;
+ }catch(error){
+  console.error('Admin transaction history error:',error);
+  rows.innerHTML='<tr><td colspan="7">Could not load transactions. Check the admin-only SELECT policy for vtu_purchase_ledger.</td></tr>';
+  message.textContent=error.message||'There was a problem loading administrator transactions.';
+ }
+}
+
+function showPage(page,btn){document.querySelectorAll('.dash-page').forEach(x=>x.classList.add('hidden'));const target=document.getElementById('page-'+page);if(!target)return;target.classList.remove('hidden');document.querySelectorAll('.side-btn').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');if(page==='buydata')loadDataPlans();if(page==='history')loadTransactionHistory();}
 
 /* The catalogue is fetched from your deployed vtu-data-plans Edge Function.
    No sample plan prices or made-up variation codes are used. */
