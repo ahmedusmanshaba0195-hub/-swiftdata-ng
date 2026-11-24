@@ -13,8 +13,16 @@ label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}input,selec
 .modal{position:fixed;inset:0;background:#10182899;display:flex;align-items:center;justify-content:center;padding:18px;z-index:30}.modal-box{width:min(460px,100%);background:#fff;border-radius:18px;padding:24px;max-height:90vh;overflow:auto}.modal-head{display:flex;justify-content:space-between;align-items:center}.close{background:#f2f4f7}
 .app-layout{display:grid;grid-template-columns:230px 1fr;gap:18px}.sidebar{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;height:max-content;position:sticky;top:82px}.side-btn{display:block;width:100%;text-align:left;background:transparent;color:#344054;margin:3px 0}.side-btn.active{background:#eff5ff;color:var(--blue)}.dash-main{min-width:0}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{background:#fff;padding:17px;border:1px solid var(--line);border-radius:14px}.stat strong{display:block;font-size:23px;margin-top:8px}.table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:14px}table{width:100%;border-collapse:collapse;min-width:550px}th,td{text-align:left;padding:13px;border-bottom:1px solid var(--line);font-size:13px}th{background:#f8fafc}
 @media(max-width:760px){.hero{grid-template-columns:1fr;padding:28px 20px}.grid{grid-template-columns:1fr}.network-grid{grid-template-columns:repeat(2,1fr)}.app-layout{grid-template-columns:1fr}.sidebar{position:static;display:grid;grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.nav{padding:12px}.nav-actions button{padding:9px 7px;font-size:12px}.brand{font-size:19px}}
-</style></head><body>
-<header><div class="nav"><div class="brand">SwiftData <span>NG</span></div><div class="nav-actions"><button class="secondary" onclick="openModal('loginModal')">Customer Login</button><button class="secondary" onclick="openAdminLogin()">Admin Login</button><button class="primary" onclick="openModal('registerModal')">Create account</button></div></div></header>
+</style>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SwiftData NG">
+
+</head><body>
+<header><div class="nav"><div class="brand">SwiftData <span>NG</span></div><div class="nav-actions"><button id="installAppButton" class="secondary hidden" type="button" onclick="installSwiftDataApp()">Install App</button><button class="secondary" onclick="openModal('loginModal')">Customer Login</button><button class="secondary" onclick="openAdminLogin()">Admin Login</button><button class="primary" onclick="openModal('registerModal')">Create account</button></div></div></header>
 <main id="home">
 <section class="hero"><div><span class="small">FAST DATA. EASY AIRTIME.</span><h1>Stay connected, the easy way.</h1><p>Buy data and airtime for your favourite networks with a simple, clear experience. Your SwiftData NG account keeps your services and activity together.</p><button class="primary" onclick="openModal('registerModal')">Get started</button> <button class="secondary" onclick="document.getElementById('purchase').scrollIntoView({behavior:'smooth'})">Explore services</button></div><div class="hero-card"><h3>Quick purchase</h3><p class="muted small">Sign in to continue with your purchase.</p><label>Service</label><select id="quickService"><option value="data">Buy Data</option><option value="airtime">Buy Airtime</option></select><label>Phone number</label><input id="quickPhone" placeholder="08012345678" inputmode="tel"><label>Network</label><select id="quickNetwork"><option>MTN</option><option>Airtel</option><option>Glo</option><option>9mobile</option></select><button class="primary" style="width:100%;margin-top:14px" onclick="quickStart()">Continue</button></div></section>
 <section class="section" id="purchase"><h2>Our services</h2><div class="grid"><div class="card"><h3>📶 Buy Data</h3><p class="muted">Choose a network and data plan for your phone.</p><button class="secondary" onclick="openModal('loginModal')">Buy data</button></div><div class="card"><h3>📱 Buy Airtime</h3><p class="muted">Select your network and enter an airtime amount.</p><button class="secondary" onclick="openModal('loginModal')">Buy airtime</button></div><div class="card"><h3>💳 Wallet</h3><p class="muted">View your wallet and funding activity from your account.</p><button class="secondary" onclick="openModal('loginModal')">Open wallet</button></div></div></section>
@@ -72,4 +80,36 @@ function selectPlan(button,plan){document.querySelectorAll('#dataPlansContainer 
 async function loadDataPlans(){const request=++dataPlansRequestNumber,network=document.getElementById('dataNetwork').value.toLowerCase(),providerNetwork=network==='9mobile'?'t2mobile':network,status=document.getElementById('dataPlansStatus'),container=document.getElementById('dataPlansContainer');selectedPlan=null;container.innerHTML='';status.className='notice';status.textContent='Loading '+network+' data plans from VTU.ng...';try{const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();if(sessionError||!session)throw new Error('Please sign in again to load data plans.');const response=await fetch(`${SUPABASE_URL}/functions/v1/vtu-data-plans?network=${encodeURIComponent(providerNetwork)}`,{method:'GET',headers:{Authorization:`Bearer ${session.access_token}`,apikey:SUPABASE_PUBLISHABLE_KEY,Accept:'application/json'}});let result;try{result=await response.json();}catch{throw new Error('The data-plan service returned an unreadable response.');}if(request!==dataPlansRequestNumber)return;console.log('VTU.ng data plan response:',result);if(!response.ok||result.success!==true)throw new Error(result?.provider_response?.message||result?.message||result?.error||`Request failed (${response.status})`);const list=extractPlanList(result.plans),plans=list.map(p=>({name:planName(p),amount:planPrice(p),variationCode:planCode(p),raw:p})).filter(p=>p.variationCode&&Number.isFinite(p.amount)&&p.amount>0);if(!plans.length){status.textContent='VTU.ng returned a response, but its plan fields could not be identified. No plan codes or prices have been guessed. Please share the browser console response so the catalogue format can be mapped correctly.';console.warn('Unrecognised plan format:',result.plans);return;}plans.forEach(p=>{const b=document.createElement('button');b.type='button';b.className='plan';const name=document.createElement('strong');name.textContent=p.name;const price=document.createElement('span');price.textContent=naira(p.amount);b.append(name,price);b.addEventListener('click',()=>selectPlan(b,{plan:p.name,price:p.amount,variationCode:p.variationCode,network:providerNetwork}));container.appendChild(b);});status.className='notice success';status.textContent=`${plans.length} ${network} data plans loaded from VTU.ng. Select your preferred plan.`;}catch(error){if(request!==dataPlansRequestNumber)return;console.error('Data plans loading error:',error);status.textContent='Could not load data plans: '+error.message;}}
 async function placeOrder(type){const phone=(type==='data'?document.getElementById('dataPhone').value:document.getElementById('airPhone').value).trim();if(!/^0\d{10}$/.test(phone)){alert('Enter a valid 11-digit Nigerian phone number.');return;}if(type==='data'&&!selectedPlan){alert('Please select a data plan from the VTU.ng catalogue.');return;}const network=(type==='data'?document.getElementById('dataNetwork').value:document.getElementById('airNetwork').value).toLowerCase(),normalizedNetwork=network==='9mobile'?'t2mobile':network,amount=type==='data'?Number(selectedPlan.price):Number(document.getElementById('airAmount').value);if(!Number.isFinite(amount)||amount<=0||(type==='airtime'&&amount<50)){alert('Enter a valid amount (minimum airtime is ₦50).');return;}const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();if(sessionError||!session){alert('Please sign in again before placing an order.');return;}const button=document.querySelector(`#page-buy${type==='data'?'data':'airtime'} .primary`);button.disabled=true;button.textContent='Submitting order...';try{const {data,error}=await supabaseClient.functions.invoke('vtu-purchase',{body:{type,network:normalizedNetwork,phone,amount,variation_code:type==='data'?selectedPlan.variationCode:null,idempotency_key:crypto.randomUUID()},headers:{Authorization:`Bearer ${session.access_token}`}});if(error)throw error;if(!data?.success)throw new Error(data?.message||data?.error||'The provider has not confirmed this order.');alert(data.status==='completed'?'Your order was completed successfully.':'Your order is being processed. Check Transactions for updates.');await Promise.allSettled([refreshWallet(),loadOverviewStats(),loadTransactionHistory()]);}catch(error){console.error('VTU purchase failed:',error);let detail=error?.message||'Unknown purchase error';try{if(error?.context&&typeof error.context.clone==='function'){const responseText=await error.context.clone().text();if(responseText){try{const result=JSON.parse(responseText);detail=result.message||result.error||result.details||responseText;}catch{detail=responseText;}}}}catch(readError){console.error('Could not read detailed purchase error:',readError);}alert('Purchase failed: '+detail+'\n\nDo not retry if an order may already be processing.');}finally{button.disabled=false;button.textContent=type==='data'?'Buy data':'Buy airtime';}}
 function quickStart(){const phone=document.getElementById('quickPhone').value;if(!/^0\d{10}$/.test(phone)){alert('Enter a valid 11-digit Nigerian phone number.');return;}openModal('loginModal');}
-</script></body></html>
+</script>
+<script>
+/* PWA setup: cache only the public app shell, never private account or payment data. */
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(err => {
+      console.error("Service worker registration failed:", err);
+    });
+  });
+}
+
+/* Android/desktop browsers may provide a native Install prompt. */
+let deferredInstallPrompt = null;
+window.addEventListener("beforeinstallprompt", event => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  const button = document.getElementById("installAppButton");
+  if (button) button.classList.remove("hidden");
+});
+async function installSwiftDataApp() {
+  if (!deferredInstallPrompt) {
+    alert("To install on iPhone: open this website in Safari, tap Share, then choose Add to Home Screen. On Android, use your browser menu and choose Install app or Add to Home screen.");
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  const button = document.getElementById("installAppButton");
+  if (button) button.classList.add("hidden");
+}
+</script>
+
+</body></html>
