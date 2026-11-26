@@ -42,7 +42,46 @@ label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}.password-r
 <section id="page-service-status" class="dash-page hidden"><div class="card"><h3>📡 Service Status</h3><p class="muted">Check the availability of data, airtime, wallet funding and other services.</p><div class="notice">Live service monitoring has not been connected yet. Status updates will appear here after the Supabase integration is completed.</div><ul class="muted"><li>Data purchases — Status unavailable</li><li>Airtime purchases — Status unavailable</li><li>Wallet funding — Status unavailable</li></ul></div></section>
 <section id="page-announcements" class="dash-page hidden"><div class="card"><h3>📢 Announcements</h3><p class="muted">Read important news, maintenance notices and updates from SwiftData NG.</p><div class="notice">No announcements to display. Announcement publishing and delivery will be connected to Supabase later.</div></div></section>
 <section id="page-settings" class="dash-page hidden"><div class="card"><h3>Settings</h3><h4>Appearance</h4><p class="muted">Choose the theme you want to use. Your choice is saved on this device.</p><div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:12px"><button id="lightThemeButton" class="secondary" type="button" onclick="setTheme('light')">☀️ Light mode</button><button id="darkThemeButton" class="secondary" type="button" onclick="setTheme('dark')">🌙 Dark mode</button></div><p id="themeStatus" class="muted small" aria-live="polite">Your appearance preference is saved automatically.</p><hr style="border:0;border-top:1px solid var(--line);margin:22px 0"><h4>Contact SwiftData NG</h4><p class="muted">Need help with a payment, data purchase or your account? Contact our support team.</p><p><strong>Gmail</strong><br><a href="mailto:ahmedusmanshaba0195@gmail.com">ahmedusmanshaba0195@gmail.com</a></p><p><strong>WhatsApp</strong><br><a href="https://wa.me/2348142179058" target="_blank" rel="noopener">08142179058</a><br><a href="https://wa.me/2349061430406" target="_blank" rel="noopener">+2349061430406</a></p></div></section>
-<section id="page-support" class="dash-page hidden"><div class="card"><h3>Help & Support</h3><p class="muted">Our support team can help with wallet funding, pending orders, failed purchases and account questions.</p><p><a class="secondary" style="display:inline-block;padding:12px 16px;border-radius:10px;text-decoration:none" href="https://wa.me/2348142179058" target="_blank" rel="noopener">Chat on WhatsApp</a></p><p><a href="mailto:ahmedusmanshaba0195@gmail.com">Email support</a></p><h4>Frequently asked questions</h4><details><summary>How do I fund my wallet?</summary><p class="muted">Open Wallet, enter an amount and choose Fund wallet with Paystack. Your wallet is credited after payment confirmation.</p></details><details><summary>What should I do if a purchase is pending?</summary><p class="muted">Check Transactions for updates. Avoid submitting the same order again while it is still processing.</p></details><details><summary>How do I contact support?</summary><p class="muted">Use the WhatsApp or Gmail contact links on this page.</p></details></div></section>
+<section id="page-support" class="dash-page hidden">
+ <div class="card">
+  <h3>💬 Help &amp; Support Centre</h3>
+  <p class="muted">Submit a complaint and track replies from the SwiftData NG support team.</p>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin:16px 0">
+   <a class="secondary" style="display:block;text-align:center;padding:13px;border-radius:10px;text-decoration:none" href="https://wa.me/2348142179058" target="_blank" rel="noopener">Chat on WhatsApp</a>
+   <a class="secondary" style="display:block;text-align:center;padding:13px;border-radius:10px;text-decoration:none" href="mailto:ahmedusmanshaba0195@gmail.com">Email support</a>
+  </div>
+  <h4>Submit a support ticket</h4>
+  <form id="supportTicketForm" onsubmit="submitSupportTicket(event)">
+   <label for="supportCategory">Issue category</label>
+   <select id="supportCategory" required>
+    <option value="">Choose a category</option><option>Wallet Funding</option><option>Failed Transaction</option><option>Pending Transaction</option><option>Data Purchase</option><option>Airtime Purchase</option><option>Account Issues</option><option>Other</option>
+   </select>
+   <label for="supportSubject">Subject</label><input id="supportSubject" maxlength="120" required placeholder="Briefly describe the issue">
+   <label for="supportDescription">Message / complaint details</label><textarea id="supportDescription" required maxlength="4000" rows="5" style="width:100%;padding:13px;border:1px solid #d0d5dd;border-radius:10px;background:var(--input);color:var(--ink);resize:vertical" placeholder="Explain what happened. Include a transaction reference if available, but never share your password or PIN."></textarea>
+   <button id="supportSubmitButton" class="primary" type="submit" style="margin-top:14px">Submit ticket</button>
+  </form>
+  <p id="supportFormStatus" class="muted small" aria-live="polite" style="margin-top:12px"></p>
+ </div>
+ <div class="card section">
+  <div class="section-title"><div><h3>My support tickets</h3><p class="muted small">Your ticket history and support replies.</p></div><button class="secondary" type="button" onclick="loadSupportTickets()">Refresh</button></div>
+  <div id="supportTicketsStatus" class="muted small" aria-live="polite">Your support tickets will appear here.</div>
+  <div id="supportTicketsList"></div>
+  <div id="supportConversation" class="hidden" style="margin-top:22px;border-top:1px solid var(--line);padding-top:16px">
+   <h4 id="supportConversationTitle">Ticket conversation</h4><div id="supportMessagesList"></div>
+   <form id="supportReplyForm" onsubmit="sendSupportReply(event)" style="margin-top:14px">
+    <label for="supportReplyText">Send a follow-up message</label><textarea id="supportReplyText" rows="3" maxlength="4000" required style="width:100%;padding:13px;border:1px solid #d0d5dd;border-radius:10px;background:var(--input);color:var(--ink);resize:vertical" placeholder="Type your message"></textarea>
+    <button class="primary" type="submit" style="margin-top:10px">Send message</button>
+   </form>
+   <p id="supportReplyStatus" class="muted small" aria-live="polite"></p>
+  </div>
+ </div>
+ <div class="card section"><h4>Frequently asked questions</h4>
+  <details><summary>How do I fund my wallet?</summary><p class="muted">Open Wallet, enter an amount and choose Fund wallet with Paystack. Your wallet is credited after payment confirmation.</p></details>
+  <details><summary>What should I do if a purchase is pending?</summary><p class="muted">Check Transactions for updates. Avoid submitting the same order again while it is still processing. You can submit a ticket if it remains unresolved.</p></details>
+  <details><summary>What if I entered the wrong phone number?</summary><p class="muted">Please contact support immediately. A successfully delivered purchase to a number entered by the customer may not be reversible.</p></details>
+  <details><summary>How do I contact support?</summary><p class="muted">Submit a ticket here, or use the WhatsApp and Gmail contact links above.</p></details>
+ </div>
+</section>
 </div></div></main>
 <div class="modal hidden" id="loginModal"><div class="modal-box"><div class="modal-head"><h2>Login</h2><button class="close" onclick="closeModal('loginModal')">✕</button></div><p class="muted small">Sign in with your SwiftData NG account.</p><label>Email address</label><input id="loginEmail" type="email" placeholder="you@example.com"><label>Password</label><input id="loginPassword" type="password" placeholder="Enter password"><button class="primary" style="width:100%;margin-top:18px" onclick="loginCustomer()">Login</button><p class="small"><a href="#" onclick="event.preventDefault();resetPassword()">Forgot password?</a></p><p class="small muted">New here? <a href="#" onclick="switchModal('loginModal','registerModal')">Create an account</a></p></div></div>
 <div class="modal hidden" id="registerModal"><div class="modal-box"><div class="modal-head"><h2>Create account</h2><button class="close" onclick="closeModal('registerModal')">✕</button></div><p class="muted small">Complete the details below to create your SwiftData NG account.</p>
@@ -204,7 +243,52 @@ async function loadReferrals(){
 async function copyReferralCode(){const value=document.getElementById('myReferralCode')?.value;if(!value)return;try{await navigator.clipboard.writeText(value);document.getElementById('referralStatus').textContent='Referral code copied.';}catch(error){document.getElementById('myReferralCode').select();document.execCommand('copy');document.getElementById('referralStatus').textContent='Referral code copied.';}}
 async function copyReferralLink(){const value=document.getElementById('myReferralLink')?.value;if(!value)return;try{if(navigator.share){await navigator.share({title:'Join SwiftData NG',text:'Sign up with my referral link:',url:value});}else{await navigator.clipboard.writeText(value);document.getElementById('referralStatus').textContent='Referral link copied. Share it with your friends.';}}catch(error){if(error.name!=='AbortError'){try{await navigator.clipboard.writeText(value);document.getElementById('referralStatus').textContent='Referral link copied. Share it with your friends.';}catch(e){document.getElementById('myReferralLink').select();document.execCommand('copy');document.getElementById('referralStatus').textContent='Referral link copied.';}}}}
 async function loadTransactionHistory(){const rows=document.getElementById('historyRows'),message=document.getElementById('historyMessage');if(!rows||!message)return;rows.innerHTML='<tr><td colspan="5" class="muted">Loading transactions...</td></tr>';message.textContent='';try{const {data:{user},error:userError}=await supabaseClient.auth.getUser();if(userError||!user)throw new Error('Your session has expired. Please log in again.');const {data,error}=await supabaseClient.from('vtu_purchase_ledger').select('id,product_type,network,phone,amount,variation_code,status,created_at,idempotency_key,provider_reference,failure_reason').eq('user_id',user.id).order('created_at',{ascending:false});if(error)throw error;rows.innerHTML='';if(!data||data.length===0){rows.innerHTML='<tr><td colspan="5" class="muted">No transactions yet.</td></tr>';message.textContent='No VTU purchases have been saved for this account yet.';return;}data.forEach(order=>{const row=document.createElement('tr'),date=order.created_at?new Date(order.created_at).toLocaleString():'—',network=String(order.network||'').toUpperCase(),details=[network,order.phone||'',order.variation_code||'',order.provider_reference||order.idempotency_key||''].filter(Boolean).join(' · ')||'—',amount=Number(order.amount),values=[date,String(order.product_type||'—').toUpperCase(),details,Number.isFinite(amount)?naira(amount):'—',String(order.status||'processing').toUpperCase()];values.forEach(value=>{const cell=document.createElement('td');cell.textContent=value;row.appendChild(cell);});rows.appendChild(row);});message.textContent=`Showing ${data.length} saved purchase${data.length===1?'':'s'}.`;}catch(error){console.error('Transaction history error:',error);rows.innerHTML='<tr><td colspan="5" class="muted">Could not load transactions. Please refresh and try again.</td></tr>';message.textContent=error.message||'There was a problem loading your transactions.';}}
-function showPage(page,btn){document.querySelectorAll('.dash-page').forEach(x=>x.classList.add('hidden'));const target=document.getElementById('page-'+page);if(!target)return;target.classList.remove('hidden');document.querySelectorAll('.side-btn').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');if(page==='buydata')loadDataPlans();if(page==='history')loadTransactionHistory();if(page==='notifications')loadNotifications();if(page==='referrals')loadReferrals();if(page==='overview'){refreshWallet();loadOverviewStats();}}
+
+let selectedSupportTicketId=null;
+async function supportCurrentUser(){const {data:{user},error}=await supabaseClient.auth.getUser();if(error||!user)throw new Error('Please sign in again to use Help & Support.');return user;}
+async function submitSupportTicket(event){
+ event.preventDefault();const form=document.getElementById('supportTicketForm'),status=document.getElementById('supportFormStatus'),button=document.getElementById('supportSubmitButton');
+ const category=document.getElementById('supportCategory').value,subject=document.getElementById('supportSubject').value.trim(),description=document.getElementById('supportDescription').value.trim();
+ if(!category||!subject||!description){status.textContent='Please complete all ticket fields.';return;}
+ button.disabled=true;button.textContent='Submitting...';status.textContent='';
+ try{
+  const user=await supportCurrentUser();
+  const {data:ticket,error}=await supabaseClient.from('support_tickets').insert({user_id:user.id,category,subject,description}).select('id,ticket_number,status,created_at').single();
+  if(error)throw error;
+  const {error:messageError}=await supabaseClient.from('support_messages').insert({ticket_id:ticket.id,sender_user_id:user.id,sender_type:'customer',message:description});
+  form.reset();status.textContent=messageError?`Ticket ${ticket.ticket_number} was created, but its opening message could not be saved. Please open the ticket and send a follow-up.`:`Your ticket ${ticket.ticket_number} has been submitted successfully.`;
+  await loadSupportTickets();if(!messageError)await openSupportTicket(ticket.id,ticket.ticket_number);
+ }catch(error){console.error('Support ticket submission error:',error);status.textContent='Could not submit your ticket: '+error.message;}
+ finally{button.disabled=false;button.textContent='Submit ticket';}
+}
+async function loadSupportTickets(){
+ const status=document.getElementById('supportTicketsStatus'),list=document.getElementById('supportTicketsList');if(!status||!list)return;
+ status.textContent='Loading your tickets...';list.replaceChildren();
+ try{
+  const user=await supportCurrentUser();const {data,error}=await supabaseClient.from('support_tickets').select('id,ticket_number,category,subject,description,status,created_at,updated_at').eq('user_id',user.id).order('created_at',{ascending:false});
+  if(error)throw error;const tickets=data||[];
+  if(!tickets.length){status.textContent='You have not submitted any support tickets yet.';return;}
+  status.textContent=`You have ${tickets.length} support ticket${tickets.length===1?'':'s'}. Select one to view its conversation.`;
+  tickets.forEach(ticket=>{const card=document.createElement('article');card.className='notification-item';const top=document.createElement('div');top.className='notification-top';const title=document.createElement('strong');title.textContent=`${ticket.ticket_number} · ${ticket.subject}`;const state=document.createElement('span');state.className='small';state.textContent=String(ticket.status||'open').replace(/_/g,' ').toUpperCase();top.append(title,state);const detail=document.createElement('p');detail.className='muted small';detail.textContent=`${ticket.category} · ${ticket.created_at?new Date(ticket.created_at).toLocaleString():'Date unavailable'}`;const button=document.createElement('button');button.type='button';button.className='secondary';button.textContent='View conversation';button.addEventListener('click',()=>openSupportTicket(ticket.id,ticket.ticket_number));card.append(top,detail,button);list.append(card);});
+ }catch(error){console.error('Support tickets loading error:',error);status.textContent='Could not load support tickets: '+error.message;}
+}
+async function openSupportTicket(ticketId,ticketNumber){
+ const panel=document.getElementById('supportConversation'),list=document.getElementById('supportMessagesList'),title=document.getElementById('supportConversationTitle'),status=document.getElementById('supportReplyStatus');
+ selectedSupportTicketId=ticketId;panel.classList.remove('hidden');title.textContent='Conversation · '+ticketNumber;list.replaceChildren();status.textContent='Loading messages...';
+ try{
+  await supportCurrentUser();const {data,error}=await supabaseClient.from('support_messages').select('id,sender_type,message,created_at').eq('ticket_id',ticketId).order('created_at',{ascending:true});
+  if(error)throw error;list.replaceChildren();(data||[]).forEach(item=>{const bubble=document.createElement('div');bubble.className='notification-item';const who=document.createElement('strong');who.textContent=item.sender_type==='support'?'SwiftData NG Support':'You';const time=document.createElement('time');time.className='muted small';time.style.display='block';time.textContent=item.created_at?new Date(item.created_at).toLocaleString():'';const body=document.createElement('p');body.style.whiteSpace='pre-wrap';body.textContent=item.message; bubble.append(who,time,body);list.append(bubble);});
+  if(!(data||[]).length){const empty=document.createElement('p');empty.className='muted small';empty.textContent='No messages on this ticket yet.';list.append(empty);}status.textContent='';panel.scrollIntoView({behavior:'smooth',block:'start'});
+ }catch(error){console.error('Support conversation loading error:',error);status.textContent='Could not load this conversation: '+error.message;}
+}
+async function sendSupportReply(event){
+ event.preventDefault();const text=document.getElementById('supportReplyText'),status=document.getElementById('supportReplyStatus'),button=document.querySelector('#supportReplyForm button[type="submit"]'),message=text.value.trim();
+ if(!selectedSupportTicketId||!message)return;button.disabled=true;status.textContent='Sending...';
+ try{const user=await supportCurrentUser();const {error}=await supabaseClient.from('support_messages').insert({ticket_id:selectedSupportTicketId,sender_user_id:user.id,sender_type:'customer',message});if(error)throw error;text.value='';await openSupportTicket(selectedSupportTicketId,document.getElementById('supportConversationTitle').textContent.replace('Conversation · ',''));status.textContent='Message sent.';}
+ catch(error){console.error('Support reply error:',error);status.textContent='Could not send message: '+error.message;}
+ finally{button.disabled=false;}
+}
+function showPage(page,btn){document.querySelectorAll('.dash-page').forEach(x=>x.classList.add('hidden'));const target=document.getElementById('page-'+page);if(!target)return;target.classList.remove('hidden');document.querySelectorAll('.side-btn').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');if(page==='buydata')loadDataPlans();if(page==='history')loadTransactionHistory();if(page==='notifications')loadNotifications();if(page==='referrals')loadReferrals();if(page==='support')loadSupportTickets();if(page==='overview'){refreshWallet();loadOverviewStats();}}
 function extractPlanList(value,depth=0){if(depth>6||value==null)return[];if(Array.isArray(value)){if(value.some(p=>p&&typeof p==='object'&&(p.variation_code||p.variationCode||p.plan_code||p.code)))return value;for(const item of value){const found=extractPlanList(item,depth+1);if(found.length)return found;}return[];}if(typeof value==='object'){for(const key of ['data','plans','variations','data_plans','products','result']){if(value[key]!==undefined){const found=extractPlanList(value[key],depth+1);if(found.length)return found;}}for(const item of Object.values(value)){const found=extractPlanList(item,depth+1);if(found.length)return found;}}return[];}
 function planCode(p){return String(p.variation_code??p.variationCode??p.plan_code??p.code??'');}
 function planName(p){return String(p.name??p.plan_name??p.title??p.description??p.variation_name??p.data??'Data plan');}
